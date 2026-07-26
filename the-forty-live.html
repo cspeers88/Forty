@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Forty — 2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --chart:#E7E9E1; --panel:#F1F2EC; --panelDeep:#DCE0D4;
+    --ink:#26261F; --ink60:rgba(38,38,31,.62); --ink38:rgba(38,38,31,.38);
+    --line:rgba(38,38,31,.16); --magenta:#B4237A; --cyan:#0F7FA8;
+    --amber:#C0700E; --green:#3E7A46;
+    --display:'Archivo',Helvetica,Arial,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--chart);color:var(--ink);font-family:var(--display);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:940px;margin:0 auto;padding:0 16px}
+  button,input{font:inherit}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  .eye{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink38)}
+  header{padding:40px 0 24px}
+  h1{font-weight:800;font-size:clamp(46px,13vw,96px);line-height:.88;letter-spacing:-.045em;margin:8px 0 0}
+  .lede{font-size:16px;line-height:1.5;color:var(--ink60);max-width:560px;margin-top:12px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:24px}
+  .chip{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;color:var(--ink);background:none;
+    border:1px solid var(--line);padding:7px 11px;border-radius:2px;cursor:pointer;transition:all .14s}
+  .chip .p{color:var(--ink38)}
+  .chip.on{background:var(--ink);color:var(--chart);border-color:var(--ink)}
+  .chip.on .p{color:var(--panelDeep)}
+  nav{display:flex;gap:24px;border-bottom:1px solid var(--line);padding-bottom:12px}
+  nav button{font-weight:700;font-size:15px;letter-spacing:-.01em;color:var(--ink38);background:none;border:none;
+    cursor:pointer;padding-bottom:12px;margin-bottom:-13px;border-bottom:2px solid transparent}
+  nav button.on{color:var(--ink);border-bottom-color:var(--magenta)}
+  main{padding:28px 0 96px}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:3px;transition:opacity .2s,border-color .2s}
+  .card.mine{border-color:var(--magenta)}
+  .card.out{opacity:.55}
+  .cbody{padding:18px}
+  .cfoot{padding:14px 18px;border-top:1px solid var(--line);background:var(--chart)}
+  h3{font-weight:800;font-size:25px;line-height:1.05;letter-spacing:-.02em}
+  .pitch{font-size:14.5px;line-height:1.45;margin-top:12px}
+  .port{font-family:var(--mono);font-size:11px;color:var(--cyan);border:1px solid var(--line);
+    padding:3px 7px;border-radius:2px;letter-spacing:.08em;white-space:nowrap}
+  .sect{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+  .bar{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;margin-top:6px}
+  .bar .who{width:52px;color:var(--ink60);letter-spacing:.04em}
+  .bar .track{flex:1;height:9px;background:var(--panelDeep);border-radius:1px;position:relative}
+  .bar .fill{position:absolute;inset:0;border-radius:1px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+  .bar .val{width:78px;text-align:right;color:var(--ink60)}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+  .tag{font-family:var(--mono);font-size:10.5px;color:var(--ink60);border:1px solid var(--line);padding:3px 7px;border-radius:2px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .num{font-family:var(--mono);font-size:13.5px;margin-top:3px}
+  .catch{margin-top:12px;font-size:13px;color:var(--ink60);line-height:1.45}
+  .catch b{color:var(--amber)}
+  .scores{display:flex;gap:6px}
+  .sc{width:34px;height:34px;font-family:var(--mono);font-size:12px;cursor:pointer;color:var(--ink60);
+    background:none;border:1px solid var(--line);border-radius:2px;transition:all .14s}
+  .sc.on{background:var(--magenta);border-color:var(--magenta);color:var(--panel)}
+  .act{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    background:none;border:1px solid var(--line);padding:7px 10px;border-radius:2px;cursor:pointer;color:var(--ink60)}
+  .act.cy{color:var(--cyan)}
+  .act.on{background:var(--ink);color:var(--panel);border-color:var(--ink)}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .note-in{width:100%;margin-top:10px;font-size:13.5px;background:var(--panel);
+    border:1px solid var(--cyan);border-radius:2px;padding:9px 10px;outline:none;color:var(--ink)}
+  .tally{margin-top:12px;padding-top:12px;border-top:1px solid var(--line);font-family:var(--mono);
+    font-size:10.5px;display:flex;gap:12px;flex-wrap:wrap}
+  .notes{margin-top:10px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink60)}
+  .notes .nm{font-family:var(--mono);font-size:10.5px;color:var(--cyan);letter-spacing:.08em}
+  .wk{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:16px;
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .wk h4{font-weight:800;font-size:20px;letter-spacing:-.02em}
+  .vote{display:flex;gap:6px}
+  .vb{font-family:var(--mono);font-size:11px;letter-spacing:.06em;padding:8px 13px;border-radius:2px;
+    cursor:pointer;background:none;border:1px solid var(--line);color:var(--ink60);transition:all .14s}
+  .rank{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:16px;
+    display:flex;align-items:center;gap:16px;margin-bottom:10px}
+  .rank.top{border-color:var(--magenta)}
+  .rank.out{opacity:.5}
+  .rbar{height:6px;background:var(--panelDeep);border-radius:1px;max-width:340px;margin-top:6px}
+  .rbar div{height:100%;background:var(--magenta);border-radius:1px;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+  .add{width:100%;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink60);background:none;border:1px dashed var(--line);padding:16px;border-radius:3px;cursor:pointer;margin-top:16px}
+  .setup{background:var(--panel);border:1px solid var(--magenta);border-radius:3px;padding:24px;margin:24px 0}
+  .setup h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+  .setup ol{margin:16px 0 0 18px;font-size:14.5px;line-height:1.7}
+  .setup code,pre{font-family:var(--mono);font-size:11.5px}
+  pre{background:var(--chart);border:1px solid var(--line);border-radius:2px;padding:12px;
+    overflow-x:auto;margin-top:10px;line-height:1.6;white-space:pre}
+  .status{position:fixed;bottom:14px;right:14px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+    background:var(--ink);color:var(--chart);padding:7px 11px;border-radius:2px;opacity:0;transition:opacity .3s;pointer-events:none}
+  .status.show{opacity:1}
+  footer{border-top:1px solid var(--line);padding:16px 0 40px;font-family:var(--mono);
+    font-size:10px;color:var(--ink38);line-height:1.7}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eye" style="color:var(--magenta)">Five men · three continents · three nights</div>
+    <h1>THE FORTY</h1>
+    <p class="lede">Everybody rates every option out of five and rules out anything that's a hard no.
+      The bars show what actually decides this: how much of the trip each of you spends in a seat.</p>
+    <div class="chips" id="who"></div>
+    <div id="conn" style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+      margin-top:14px;color:var(--ink38)">CONNECTING…</div>
+  </header>
+  <nav id="nav"></nav>
+  <main id="main"></main>
+  <footer>
+    COSTS ARE CAD ESTIMATES FOR 3 NIGHTS, SHOULDER SEASON, BOOKED ~4 MONTHS OUT. AIRFARE RANGES ARE THE
+    WEAKEST NUMBERS HERE — TREAT THEM AS ORDER-OF-MAGNITUDE. FLIGHT HOURS ARE DOOR-TO-GATE INCLUDING
+    CONNECTIONS AND ARE MORE RELIABLE.
+  </footer>
+</div>
+<div class="status" id="status"></div>
+
+<script>
+/* Supabase config — already wired up. */
+const SUPABASE_URL = "https://dcvilzmthmxnjxzzdplx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRjdmlsem10aG14bmp4enpkcGx4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwNzYzOTQsImV4cCI6MjEwMDY1MjM5NH0.zKRin0JPO8rilO5XYDg5pR8grNcuwOG_Z_8BQUccZNY";
+
+const GROUND = 72;
+const PEOPLE = [
+  {id:"nick",name:"Nick",home:"Toronto",port:"YYZ"},
+  {id:"adam",name:"Adam",home:"Barrie",port:"YYZ"},
+  {id:"craig",name:"Craig",home:"Fonthill",port:"YYZ"},
+  {id:"miles",name:"Miles",home:"Ireland",port:"DUB"},
+  {id:"garret",name:"Garret",home:"Australia",port:"SYD"},
+];
+const SEED = [
+  {id:"kef",city:"Reykjavík",country:"Iceland",port:"KEF",ground:1300,when:"May–Jun, Sep",
+   pitch:"The only place on this list genuinely halfway between Ontario and Ireland.",
+   doing:["Glacier hike","Lava-tube caving","Sea angling","Hot springs","Super-jeep highlands"],
+   catch:"Food and beds cost what they cost. Budget bleeds on the ground, not in the air.",
+   legs:{YYZ:[5.5,750],DUB:[3,350],SYD:[27,3200]}},
+  {id:"lis",city:"Lisbon",country:"Portugal",port:"LIS",ground:800,when:"Apr–Jun, Sep–Oct",
+   pitch:"Cheapest good time per dollar in Europe, warm enough to be outside all day.",
+   doing:["Surf at Ericeira","Sintra","Golf","Tasca crawl","Sunset boat"],
+   catch:"It's a city trip. If you want wilderness, this isn't it.",
+   legs:{YYZ:[6.5,950],DUB:[2.75,250],SYD:[26,2800]}},
+  {id:"pdl",city:"Azores",country:"São Miguel",port:"PDL",ground:750,when:"Jun–Sep",
+   pitch:"Mid-Atlantic volcanic island. Short flights from both sides, almost nobody goes.",
+   doing:["Whale watching","Crater lakes","Canyoning","Thermal pools","Furnas cook-in-the-ground"],
+   catch:"Weather is a coin flip and one road closure reshapes the day.",
+   legs:{YYZ:[5.5,800],DUB:[6.5,500],SYD:[31,3300]}},
+  {id:"edi",city:"Edinburgh",country:"Scotland",port:"EDI",ground:1000,when:"May–Jun, Sep",
+   pitch:"Old town, then two hours north into the Highlands. Miles can practically walk.",
+   doing:["Highlands drive","Distillery","Links golf","Loch kayak","Ghost-tour nonsense"],
+   catch:"Rain. And it's the most 'we've kind of done this' option for the Ontario three.",
+   legs:{YYZ:[7,1000],DUB:[1.25,200],SYD:[25,2900]}},
+  {id:"dub",city:"Dublin + Wicklow",country:"Ireland",port:"DUB",ground:950,when:"May–Sep",
+   pitch:"Miles hosts. Cheapest possible trip for one of you and a real one for the rest.",
+   doing:["Wicklow hillwalk","Sea swim","The European Club","Pub session","Coastal drive"],
+   catch:"One person is home. That changes the trip, for better and worse.",
+   legs:{YYZ:[6.5,900],DUB:[.5,0],SYD:[24,2700]}},
+  {id:"hnl",city:"Oahu",country:"Hawaii",port:"HNL",ground:1400,when:"Apr–Jun, Sep–Oct",
+   pitch:"The only place on this list where Garret has a direct flight — and it's under eleven hours.",
+   doing:["North Shore surf","Diamond Head at dawn","Kualoa ATV","Shark cage dive","Poke crawl"],
+   catch:"Flips the problem rather than solving it. Miles now has the worst day on the board.",
+   legs:{YYZ:[13,1250],DUB:[21,1800],SYD:[11,1650]}},
+  {id:"bna",city:"Nashville",country:"Tennessee",port:"BNA",ground:1100,when:"Apr–May, Sep–Oct",
+   pitch:"Two hours from Pearson. If the goal is maximum time together, this wins on math.",
+   doing:["Broadway honky-tonks","Studio session","Whiskey tour","Preds game","BBQ"],
+   catch:"Wildly lopsided. Easy for three, a whole ordeal for two.",
+   legs:{YYZ:[2.25,500],DUB:[13,1000],SYD:[24,2500]}},
+  {id:"lir",city:"Guanacaste",country:"Costa Rica",port:"LIR",ground:900,when:"Dec–Apr",
+   pitch:"Surf in the morning, volcano in the afternoon, warm water the whole time.",
+   doing:["Surf lessons","Zip line","Rio Celeste","Hot springs","Catamaran"],
+   catch:"Three nights is thin for a place where the good stuff is two hours apart.",
+   legs:{YYZ:[5.5,750],DUB:[16,1200],SYD:[27,2900]}},
+];
+const WEEKENDS = [
+  {id:"w1",label:"Apr 22–25",note:"Cheapest airfare of the year"},
+  {id:"w2",label:"May 20–24",note:"Victoria Day — 4 nights, one less vacation day"},
+  {id:"w3",label:"Jun 10–13",note:"Long daylight, before peak pricing"},
+  {id:"w4",label:"Sep 16–19",note:"Shoulder season, kids back in school"},
+  {id:"w5",label:"Oct 7–11",note:"Cdn Thanksgiving — 4 nights, family politics"},
+];
+
+/* ---------- state ---------- */
+const TABLE = "forty_state";
+function readCfg(){
+  if(SUPABASE_URL && SUPABASE_ANON_KEY) return {u:SUPABASE_URL,k:SUPABASE_ANON_KEY};
+  const h = location.hash.match(/cfg=([^&]+)/);
+  if(h){ try{ const c=JSON.parse(atob(decodeURIComponent(h[1])));
+    localStorage.setItem("forty:cfg",JSON.stringify(c)); return c; }catch(e){} }
+  try{ const s=localStorage.getItem("forty:cfg"); if(s) return JSON.parse(s); }catch(e){}
+  return null;
+}
+let cfg = readCfg();
+let configured = !!cfg;
+function shareLink(c){
+  return location.origin + location.pathname + "#cfg=" +
+    encodeURIComponent(btoa(JSON.stringify({u:c.u,k:c.k})));
+}
+/* Plain REST against PostgREST — no library, no CDN, no module. */
+function api(c,path,opts){
+  return fetch(c.u.replace(/\/+$/,"")+"/rest/v1/"+path, {
+    ...opts,
+    headers:{ apikey:c.k, Authorization:"Bearer "+c.k,
+      "Content-Type":"application/json", ...(opts&&opts.headers||{}) }
+  });
+}
+let me = localStorage.getItem("forty:me") || null;
+let tab = "places";
+let ballots = {};
+let custom = [];
+const blank = () => ({scores:{},no:[],notes:{},dates:{}});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function toast(t){const e=document.getElementById("status");e.textContent=t;e.classList.add("show");
+  clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),1600);}
+
+let lastSync=null, lastErr=null, unsaved=false;
+function setConn(){
+  const el=document.getElementById("conn"); if(!el) return;
+  if(lastErr){ el.style.color="#B4237A";
+    el.textContent="● NOT SAVING — "+lastErr.toUpperCase(); return; }
+  if(!lastSync){ el.textContent="CONNECTING…"; return; }
+  const n=Object.keys(ballots).length;
+  const secs=Math.round((Date.now()-lastSync)/1000);
+  el.style.color= unsaved ? "#C0700E" : "#3E7A46";
+  el.textContent=(unsaved?"● SAVING…":"● LIVE")+" · "+n+" BALLOT"+(n===1?"":"S")+
+    " ON SERVER · SYNCED "+(secs<5?"JUST NOW":secs+"S AGO");
+}
+async function pull(){
+  if(!cfg) return;
+  try{
+    const r = await api(cfg,"forty_state?select=id,data");
+    if(!r.ok) throw new Error("HTTP "+r.status+" "+(await r.text()).slice(0,90));
+    const data = await r.json();
+    const mineLocal = (unsaved && me) ? ballots[me] : null;
+    ballots={};custom=[];
+    for(const row of data){
+      if(row.id==="custom") custom = row.data||[];
+      else if(row.id.startsWith("ballot:")) ballots[row.id.slice(7)] = row.data;
+    }
+    if(mineLocal) ballots[me]=mineLocal;   // never let a poll wipe an unsaved vote
+    lastSync=Date.now(); lastErr=null;
+  }catch(e){ lastErr=e.message||String(e); }
+  setConn();
+}
+async function push(id,payload){
+  if(!cfg) return;
+  unsaved=true; setConn();
+  try{
+    const r = await api(cfg,"forty_state",{ method:"POST",
+      headers:{ Prefer:"resolution=merge-duplicates,return=minimal" },
+      body: JSON.stringify({id,data:payload,updated_at:new Date().toISOString()}) });
+    if(!r.ok) throw new Error("HTTP "+r.status+" "+(await r.text()).slice(0,90));
+    unsaved=false; lastErr=null; lastSync=Date.now(); toast("SAVED");
+  }catch(e){ unsaved=false; lastErr=e.message||String(e); toast("SAVE FAILED"); }
+  setConn();
+}
+const myBallot = () => me ? (ballots[me] ?? blank()) : null;
+function mutate(fn){
+  if(!me) return;
+  const b = fn(structuredClone(ballots[me] ?? blank()));
+  ballots[me]=b; render(); push("ballot:"+me,b);
+}
+
+/* ---------- render ---------- */
+const all = () => [...SEED,...custom];
+
+function airBar(p,d){
+  const rt = d.legs[p.port][0]*2, pct = Math.min(100, rt/(rt+GROUND)*100);
+  const col = pct>=42?"var(--magenta)":pct>=30?"var(--amber)":"var(--cyan)";
+  return `<div class="bar"><div class="who">${p.name.toUpperCase()}</div>
+    <div class="track"><div class="fill" style="width:${pct}%;background:${col}"></div></div>
+    <div class="val" style="${pct>=30?`color:${col}`:""}">${rt>=10?Math.round(rt):rt.toFixed(1)}h · ${Math.round(pct)}%</div></div>`;
+}
+
+function cardHTML(d){
+  const b = myBallot(), mine = b?.scores?.[d.id] ?? null, out = (b?.no??[]).includes(d.id);
+  const sc = PEOPLE.map(p=>ballots[p.id]?.scores?.[d.id]).filter(Boolean);
+  const avg = sc.length ? sc.reduce((a,x)=>a+x,0)/sc.length : null;
+  const nos = PEOPLE.filter(p=>(ballots[p.id]?.no??[]).includes(d.id)).map(p=>p.name);
+  const notes = PEOPLE.map(p=>({p,t:ballots[p.id]?.notes?.[d.id]})).filter(x=>x.t);
+  const worst = PEOPLE.reduce((a,p)=>{const h=d.legs[p.port][0]*2;return h>a.h?{h,p}:a;},{h:0,p:null});
+  const wpct = Math.round(worst.h/(worst.h+GROUND)*100);
+  const tot = PEOPLE.map(p=>d.legs[p.port][1]+d.ground);
+  return `<div class="card ${mine?"mine":""} ${out?"out":""}">
+    <div class="cbody">
+      <div class="row" style="align-items:flex-start">
+        <div><h3>${esc(d.city)}</h3><div class="eye">${esc(d.country)}</div></div>
+        <div class="port">${esc(d.port)}</div>
+      </div>
+      <p class="pitch">${esc(d.pitch)}</p>
+      <div class="sect"><div class="eye">Share of the trip spent in a seat</div>
+        ${PEOPLE.map(p=>airBar(p,d)).join("")}
+        ${wpct>=30?`<div style="margin-top:10px;font-family:var(--mono);font-size:10.5px;color:${wpct>=42?"var(--magenta)":"var(--amber)"}">${worst.p.name} loses ${wpct}% of the trip to flying.</div>`:""}
+      </div>
+      <div class="tags">${d.doing.map(a=>`<span class="tag">${esc(a)}</span>`).join("")}</div>
+      <div class="two">
+        <div><div class="eye">All-in, per person</div><div class="num">$${Math.min(...tot).toLocaleString()}–${Math.max(...tot).toLocaleString()}</div></div>
+        <div><div class="eye">Go when</div><div class="num">${esc(d.when)}</div></div>
+      </div>
+      <div class="catch"><b>The catch — </b>${esc(d.catch)}</div>
+    </div>
+    <div class="cfoot">
+      ${me?`<div class="row">
+        <div class="scores">${[1,2,3,4,5].map(n=>`<button class="sc ${mine===n?"on":""}" data-sc="${d.id}" data-n="${n}">${n}</button>`).join("")}</div>
+        <div style="display:flex;gap:8px">
+          <button class="act cy" data-why="${d.id}">Say why</button>
+          <button class="act ${out?"on":""}" data-no="${d.id}">${out?"Ruled out":"Rule out"}</button>
+        </div></div>
+        <div id="why-${d.id}"></div>`
+      :`<div style="font-family:var(--mono);font-size:10.5px;color:var(--ink38);letter-spacing:.08em">PICK YOUR NAME UP TOP TO VOTE</div>`}
+      ${(avg||nos.length)?`<div class="tally">${avg?`<span>${avg.toFixed(1)} avg · ${sc.length}/5 in</span>`:""}${nos.length?`<span style="color:var(--magenta)">Ruled out by ${nos.join(", ")}</span>`:""}</div>`:""}
+      ${notes.length?`<div class="notes">${notes.map(({p,t})=>`<div><span class="nm">${p.name.toUpperCase()}</span> ${esc(t)}</div>`).join("")}</div>`:""}
+    </div></div>`;
+}
+
+function render(){
+  document.getElementById("who").innerHTML =
+    `<span class="eye" style="letter-spacing:.14em">YOU ARE</span>` +
+    PEOPLE.map(p=>`<button class="chip ${me===p.id?"on":""}" data-me="${p.id}">${p.name}<span class="p"> · ${p.port}</span></button>`).join("");
+  const voted = PEOPLE.filter(p=>Object.keys(ballots[p.id]?.scores??{}).length||(ballots[p.id]?.no??[]).length).length;
+  document.getElementById("nav").innerHTML = [["places","Places"],["weekends","Weekends"],["tally","Tally"]]
+    .map(([k,l])=>`<button class="${tab===k?"on":""}" data-tab="${k}">${l}${k==="tally"&&voted?` <span style="font-family:var(--mono);font-size:10.5px;color:var(--magenta)">${voted}/5</span>`:""}</button>`).join("");
+
+  const m = document.getElementById("main");
+  if(!configured){ m.innerHTML = setupHTML(); return; }
+
+  if(tab==="places"){
+    m.innerHTML = `<div class="grid">${all().map(cardHTML).join("")}</div>
+      <div id="addhost"><button class="add" id="addbtn">+ Propose somewhere else</button></div>`;
+  }
+  if(tab==="weekends"){
+    const b=myBallot();
+    const tal = WEEKENDS.map(w=>{
+      const v=PEOPLE.map(p=>({p,r:ballots[p.id]?.dates?.[w.id]})).filter(x=>x.r);
+      return {w,yes:v.filter(x=>x.r==="yes").map(x=>x.p.name),maybe:v.filter(x=>x.r==="maybe").map(x=>x.p.name),no:v.filter(x=>x.r==="no").map(x=>x.p.name)};
+    }).sort((a,b2)=>b2.yes.length*2+b2.maybe.length-(a.yes.length*2+a.maybe.length));
+    m.innerHTML = `<p class="lede" style="margin-bottom:20px">Thursday to Sunday unless noted. The two long
+      weekends buy you a fourth night for the same vacation days, which matters most for whoever's flying furthest.</p>` +
+      tal.map(({w,yes,maybe,no})=>{
+        const mine=b?.dates?.[w.id];
+        return `<div class="wk"><div>
+          <h4>${w.label} <span style="font-family:var(--mono);font-size:11px;color:var(--ink38)">2027</span></h4>
+          <div style="font-size:13px;color:var(--ink60);margin-top:2px">${w.note}</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-family:var(--mono);font-size:10.5px">
+            ${yes.length?`<span style="color:var(--green)">IN — ${yes.join(", ")}</span>`:""}
+            ${maybe.length?`<span style="color:var(--amber)">MAYBE — ${maybe.join(", ")}</span>`:""}
+            ${no.length?`<span style="color:var(--magenta)">OUT — ${no.join(", ")}</span>`:""}</div></div>
+          ${me?`<div class="vote">${[["yes","In","var(--green)"],["maybe","Maybe","var(--amber)"],["no","Out","var(--magenta)"]]
+            .map(([v,l,c])=>`<button class="vb" data-wk="${w.id}" data-v="${v}" ${mine===v?`style="background:${c};border-color:${c};color:var(--panel)"`:""}>${l}</button>`).join("")}</div>`:""}
+        </div>`;}).join("");
+  }
+  if(tab==="tally"){
+    const ranked = all().map(d=>{
+      const sc=PEOPLE.map(p=>ballots[p.id]?.scores?.[d.id]).filter(Boolean);
+      const nos=PEOPLE.filter(p=>(ballots[p.id]?.no??[]).includes(d.id));
+      return {d,n:sc.length,avg:sc.length?sc.reduce((a,x)=>a+x,0)/sc.length:0,nos};
+    }).sort((a,b2)=>a.nos.length-b2.nos.length||b2.avg-a.avg||b2.n-a.n);
+    m.innerHTML = `<p class="lede" style="margin-bottom:20px">Anything one person has ruled out drops to the
+      bottom regardless of score. Five people, three nights — a place four of you love and one of you can't do isn't the answer.</p>` +
+      ranked.map(({d,avg,n,nos},i)=>`<div class="rank ${i===0&&n&&!nos.length?"top":""} ${nos.length?"out":""}">
+        <div style="font-family:var(--mono);font-size:11px;color:var(--ink38);width:22px">${String(i+1).padStart(2,"0")}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:17px;letter-spacing:-.015em">${esc(d.city)}</div>
+          <div class="rbar"><div style="width:${avg/5*100}%;${nos.length?"background:var(--ink38)":""}"></div></div>
+          ${nos.length?`<div style="font-family:var(--mono);font-size:10.5px;color:var(--magenta);margin-top:5px">Ruled out by ${nos.map(p=>p.name).join(", ")}</div>`:""}
+        </div>
+        <div style="font-family:var(--mono);font-size:13px;text-align:right">${n?avg.toFixed(1):"—"}
+          <div style="font-size:10px;color:var(--ink38)">${n}/5 in</div></div></div>`).join("");
+  }
+}
+
+function setupHTML(){
+  return `<div class="setup"><h2>Two values, pasted below. Then it's live.</h2>
+  <p style="font-size:14.5px;color:var(--ink60);line-height:1.5">Nothing to install, no file to edit —
+  it all happens in this page and one other browser tab.</p>
+  <ol>
+    <li>Go to <code>supabase.com</code> → sign in with GitHub or email → <b>New project</b>. Any name, any region, free tier. Takes about a minute to spin up.</li>
+    <li>Open the <b>SQL Editor</b> in the left sidebar, paste this, hit Run:
+      <pre>create table forty_state (
+  id text primary key,
+  data jsonb not null,
+  updated_at timestamptz default now()
+);
+alter table forty_state enable row level security;
+create policy "read"   on forty_state for select using (true);
+create policy "insert" on forty_state for insert with check (true);
+create policy "update" on forty_state for update using (true);</pre></li>
+    <li>Go to <b>Project Settings → API Keys</b>. Copy the <b>Project URL</b> and the key labelled
+      <b>anon public</b> (newer projects call it <b>publishable</b> and it starts <code>sb_publishable_</code>).
+      Either one works. Never the <b>service_role</b> or <b>secret</b> key.</li>
+    <li>Paste both here:
+      <div style="display:flex;flex-direction:column;gap:8px;margin:12px 0 0">
+        <input id="cfg-u" class="note-in" style="margin:0;border-color:var(--line)" placeholder="https://yourproject.supabase.co">
+        <input id="cfg-k" class="note-in" style="margin:0;border-color:var(--line)" placeholder="anon public key — the long one">
+        <div><button class="act cy" id="cfg-go" style="padding:10px 16px">Connect and go live</button></div>
+        <div id="cfg-msg" style="font-size:13px;line-height:1.5"></div>
+      </div></li>
+  </ol>
+  <p style="font-size:13px;color:var(--ink60);line-height:1.5;margin-top:16px">
+  <b style="color:var(--amber)">Worth knowing:</b> the anon key is public by design — anyone with the link
+  can read and write votes. For five friends picking a destination that's fine. Don't reuse this pattern for
+  anything you'd mind a stranger editing.</p></div>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", async e => {
+  const t = e.target.closest("button"); if(!t) return;
+  if(t.dataset.me){ me=t.dataset.me; localStorage.setItem("forty:me",me); render(); }
+  else if(t.dataset.tab){ tab=t.dataset.tab; render(); }
+  else if(t.dataset.sc){ const id=t.dataset.sc,n=+t.dataset.n;
+    mutate(b=>{ if(b.scores[id]===n) delete b.scores[id]; else b.scores[id]=n;
+      b.no=(b.no||[]).filter(x=>x!==id); return b; }); }
+  else if(t.dataset.no){ const id=t.dataset.no;
+    mutate(b=>{ const on=(b.no||[]).includes(id); if(!on) delete b.scores[id];
+      b.no = on ? b.no.filter(x=>x!==id) : [...(b.no||[]),id]; return b; }); }
+  else if(t.dataset.wk){ const id=t.dataset.wk,v=t.dataset.v;
+    mutate(b=>{ if(b.dates[id]===v) delete b.dates[id]; else b.dates[id]=v; return b; }); }
+  else if(t.dataset.why){ const id=t.dataset.why, host=document.getElementById("why-"+id);
+    if(host.firstChild){host.innerHTML="";return;}
+    host.innerHTML=`<input class="note-in" placeholder="One line the others will read" value="${esc(myBallot()?.notes?.[id]??"")}">`;
+    const inp=host.firstChild; inp.focus();
+    const commit=()=>{const v=inp.value.trim();host.innerHTML="";
+      mutate(b=>{ if(v) b.notes[id]=v; else delete b.notes[id]; return b; });};
+    inp.addEventListener("keydown",ev=>{if(ev.key==="Enter")commit();});
+    inp.addEventListener("blur",commit); }
+  else if(t.id==="cfg-go"){
+    const u=document.getElementById("cfg-u").value.trim().replace(/\/+$/,"");
+    const k=document.getElementById("cfg-k").value.trim();
+    const msg=document.getElementById("cfg-msg");
+    if(!u||!k){msg.innerHTML=`<span style="color:var(--magenta)">Both fields are needed.</span>`;return;}
+    msg.textContent="Testing the connection…";
+    try{
+      const test={u,k};
+      const r=await api(test,"forty_state?select=id&limit=1");
+      if(!r.ok) throw new Error("HTTP "+r.status+" "+(await r.text()).slice(0,120));
+      cfg=test; configured=true;
+      localStorage.setItem("forty:cfg",JSON.stringify(cfg));
+      const link=shareLink(cfg);
+      history.replaceState(null,"","#cfg="+encodeURIComponent(btoa(JSON.stringify(cfg))));
+      msg.innerHTML=`<b style="color:var(--green)">Connected.</b> Send this exact link to the group —
+        the part after the # is what carries the connection:
+        <div style="margin-top:8px;font-family:var(--mono);font-size:11px;word-break:break-all;
+        background:var(--chart);border:1px solid var(--line);padding:10px;border-radius:2px">${esc(link)}</div>`;
+      await pull(); setTimeout(()=>{tab="places";render();},2500);
+    }catch(err){
+      msg.innerHTML=`<span style="color:var(--magenta)">Couldn't connect: ${esc(err.message||err)}</span>
+        <div style="color:var(--ink60);margin-top:6px">Usually this means the SQL in step 2 hasn't been run yet,
+        or the key is the secret one instead of the public one.</div>`;
+    }
+  }
+  else if(t.id==="addbtn"){
+    document.getElementById("addhost").innerHTML =
+      `<div style="background:var(--panel);border:1px solid var(--cyan);border-radius:3px;padding:16px;margin-top:16px">
+        <div class="eye" style="color:var(--cyan)">Propose somewhere</div>
+        <input class="note-in" id="ad-city" placeholder="City">
+        <input class="note-in" id="ad-country" placeholder="Country">
+        <input class="note-in" id="ad-pitch" placeholder="Why it's worth three nights">
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="act cy" id="addsave">Add it</button>
+          <button class="act" id="addcancel">Cancel</button>
+        </div></div>`;
+    document.getElementById("ad-city").focus(); }
+  else if(t.id==="addcancel"){ render(); }
+  else if(t.id==="addsave"){
+    const city=document.getElementById("ad-city").value.trim();
+    if(!city){ document.getElementById("ad-city").focus(); return; }
+    custom=[...custom,{id:"x"+Date.now().toString(36),city,
+      country:document.getElementById("ad-country").value.trim()||"Proposed",
+      port:"???",
+      pitch:document.getElementById("ad-pitch").value.trim()||"Someone thought this was worth a look.",
+      doing:["To be filled in"],ground:900,when:"TBD",
+      catch:"Nobody's checked the flight math on this one yet.",
+      legs:{YYZ:[8,1000],DUB:[8,800],SYD:[24,2800]}}];
+    render(); await push("custom",custom); }
+});
+
+/* ---------- boot + live sync ---------- */
+/* ---------- boot ---------- */
+try{ render(); setConn(); }catch(e){
+  document.getElementById("main").innerHTML =
+    '<div style="font-family:var(--mono);font-size:12px;color:#B4237A">Render failed: '+
+    (e.message||e)+'</div>';
+}
+if(configured){
+  (async ()=>{
+    await pull(); render(); setConn();
+    setInterval(async ()=>{ await pull(); render(); setConn(); }, 8000);
+    setInterval(setConn, 1000);
+  })();
+} else { setConn(); }
+</script>
+</body>
+</html>
