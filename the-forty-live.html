@@ -99,6 +99,27 @@
   footer{border-top:1px solid var(--line);padding:16px 0 40px;font-family:var(--mono);
     font-size:10px;color:var(--ink38);line-height:1.7}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  .itinbtn{width:100%;margin-top:14px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--cyan);background:none;border:1px solid var(--cyan);
+    padding:11px;border-radius:2px;cursor:pointer;transition:all .14s}
+  .itinbtn:hover{background:var(--cyan);color:var(--panel)}
+  .detail{position:fixed;inset:0;background:var(--chart);z-index:50;overflow-y:auto;
+    -webkit-overflow-scrolling:touch}
+  .detail .inner{max-width:720px;margin:0 auto;padding:20px 16px 80px}
+  .backbtn{position:sticky;top:0;background:var(--chart);padding:14px 0;margin-bottom:8px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink);background:var(--chart);border:none;cursor:pointer;z-index:2}
+  .dhero h2{font-weight:800;font-size:clamp(34px,10vw,60px);line-height:.9;letter-spacing:-.03em;margin-top:8px}
+  .dhero .sub{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink38);margin-top:8px}
+  .leg{display:flex;gap:10px;margin-top:8px;font-family:var(--mono);font-size:11px;color:var(--ink60);flex-wrap:wrap}
+  .dblock{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+  .dblock .day{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--magenta)}
+  .dblock h3{font-weight:800;font-size:22px;letter-spacing:-.02em;margin-top:4px}
+  .dblock p{font-size:14.5px;line-height:1.5;color:var(--ink);margin-top:8px}
+  .dblock .eve{font-size:13.5px;line-height:1.45;color:var(--ink60);margin-top:8px}
+  .dblock .eve b{color:var(--amber);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+  .dnote{margin-top:8px;font-size:14px;line-height:1.5;color:var(--ink)}
+  .dnote.travel{color:var(--ink60);font-style:italic}
 </style>
 </head>
 <body>
@@ -177,6 +198,50 @@ const SEED = [
    catch:"Three nights is thin for a place where the good stuff is two hours apart.",
    legs:{YYZ:[5.5,750],DUB:[16,1200],SYD:[27,2900]}},
 ];
+/* 3-day itineraries: arrival evening + two solid activity days + departure.
+   Written for this group specifically — Day 1 usable-ness reflects real flight times. */
+const ITIN = {
+  kef:{arrive:"Land at Keflavík, grab the rental. Ontario three arrive mid-afternoon fresh; Garret's a zombie after 27h. Don't fight it — soak at the Sky Lagoon on the way in, casual dinner in Reykjavík, early night.",
+    days:[
+      {t:"Golden Circle",p:"The classic loop, done first because it sets up the South Coast. Þingvellir to stand between two continents, Geysir erupting on cue, Gullfoss thundering. Add Kerið crater and the Secret Lagoon soak on the way back. Compact, paved, ~6h with stops.",e:"Dinner in Reykjavík, then a lava-tube caving trip or just the bars on Laugavegur."},
+      {t:"South Coast",p:"The dramatic day — give it the longer window. Seljalandsfoss you walk behind, Skógafoss, the black sand and basalt columns at Reynisfjara, out to Vík. ~10h round trip, food is scarce past Vík so pack lunch.",e:"Last night — a proper group dinner, splurge on the lamb."}],
+    depart:"Morning flights home. Keflavík is 45 min from the city, leave time."},
+  lis:{arrive:"Land at Lisbon, taxi into Alfama. Everyone but Garret lands in reasonable shape. Grab a rooftop, first round of green wine and petiscos, ease in.",
+    days:[
+      {t:"Lisbon proper",p:"Tram 28 through the old town, Time Out Market for lunch, Belém for the tower and the original pastéis de nata. Afternoon it's a sunset boat on the Tagus with beers. This is the walk-and-eat day.",e:"Bairro Alto crawl — the whole neighbourhood is one big open bar."},
+      {t:"Sintra or surf",p:"Two ways to play it. Culture: day trip to Sintra for the Pena Palace and Quinta da Regaleira, 40 min out. Or the group vote — surf lesson at Ericeira, Portugal's best beginner breaks, an hour up the coast. Either fills a full day.",e:"Seafood in Cais do Sodré, then port and cards."}],
+    depart:"Late checkout, one more custard tart, airport. Central and easy."},
+  pdl:{arrive:"Land at Ponta Delgada. Short flights from both sides so most of you arrive with the evening intact. Grab the rental, cheese-and-wine dinner in town, plan around tomorrow's weather.",
+    days:[
+      {t:"Sete Cidades + west",p:"The twin crater lakes — hike the rim at Vista do Rei, then down to the water. Afternoon at the Ferraria hot springs where a thermal river meets the sea. Volcanic island at its best. Weather-dependent, have a plan B.",e:"Grilled fish back in Ponta Delgada."},
+      {t:"Furnas",p:"The geothermal valley. Watch them dig the cozido out of the ground — stew cooked by volcano — and eat it. Terra Nostra botanical garden with its warm iron-rich pool. Whale watching in the morning first if the sea's calm.",e:"Last night, local wine, early-ish — travel tomorrow."}],
+    depart:"Fly out. Small airport, painless — but connections home are long, especially for Garret."},
+  edi:{arrive:"Land at Edinburgh. Miles nearly walks off the plane; the Ontario three land tired but functional. First pints in the Old Town, get your bearings.",
+    days:[
+      {t:"Edinburgh",p:"The castle, a wander down the Royal Mile, Arthur's Seat if legs allow. Afternoon whisky — Scotch Whisky Experience or a proper tasting. This is the city day before you head north.",e:"Ghost tour through the vaults if you want the nonsense, then a snug pub."},
+      {t:"Highlands",p:"The reason you came. Drive north — Loch Lomond, Glencoe's valley, a distillery en route. Long day in the car but the scenery earns it. Or swap for a round of links golf if the group leans that way.",e:"Back in the city, big last dinner, late whisky."}],
+    depart:"Fly home. Central airport, tram from the city, easy."},
+  dub:{arrive:"Miles hosts, so this runs differently. Everyone else lands and drops bags at the rental; Miles is already sorted. First session at a proper Dublin pub, no agenda.",
+    days:[
+      {t:"Wicklow",p:"South into the mountains — 'the garden of Ireland.' Hillwalk at Glendalough past the monastic ruins and lakes, a bracing sea swim on the coast if anyone's brave. Miles knows the good stops. Full day out of the city.",e:"Back to Dublin, dinner, Temple Bar if you must or somewhere Miles rates more."},
+      {t:"Coast + golf",p:"Round at The European Club, one of the great links, or the Howth coastal walk with a seafood lunch if golf's not universal. Afternoon in the city — Guinness Storehouse is touristy but the top-floor pint earns it.",e:"Last big session. You're in Ireland; do it right."}],
+    depart:"Fly out. Miles waves you off and goes home to bed."},
+  hnl:{arrive:"Land at Honolulu. This flips the whole board — Garret arrives fresh off a direct flight, the Ontario three are wrecked after 13h+, Miles worst of all. Sunset and a first Mai Tai in Waikiki, everyone horizontal early.",
+    days:[
+      {t:"North Shore",p:"Drive up the coast. Watch the big-wave breaks at Waimea and Pipeline, snorkel calmer Shark's Cove, garlic shrimp from the Giovanni's truck, shave ice at Matsumoto's. The classic Oahu day. ~40 min each way.",e:"Back to Waikiki, dinner on the beach."},
+      {t:"Diamond Head + water",p:"Dawn hike up Diamond Head before the heat for the crater-and-coast view. Afternoon on the water — Kualoa ATV through the movie valleys, or a catamaran, or the group vote. Big range here.",e:"Last night — luau if you want the cliché done well, or just poke and beers."}],
+    depart:"Fly home. Garret's trip is easy; everyone else faces the long haul back."},
+  bna:{arrive:"Land at Nashville. The Ontario three are here in two hours flat and fresh; Miles and Garret paid dearly to arrive. Straight to Broadway for the first round — the honky-tonks are already loud.",
+    days:[
+      {t:"Music + whiskey",p:"Lower Broadway by day, then a distillery tour — Nashville Craft or out to a Tennessee whiskey house. Afternoon record-shopping in East Nashville. Optional: book a studio hour and actually cut a track, the ridiculous group memory.",e:"Live music crawl — every bar has a real band. Hatch a plan and follow the sound."},
+      {t:"BBQ + game",p:"Slow morning, then serious barbecue — Martin's or Peg Leg Porker. Afternoon a Predators or Titans game if the calendar lines up, or the Country Music Hall of Fame if it doesn't. Southern day, unhurried.",e:"Last night back on Broadway. Rooftop bars for the view, then down into the noise."}],
+    depart:"Fly home. Easy for three of you, a long ordeal for two — the lopsidedness bookends the trip."},
+  lir:{arrive:"Land at Liberia. Long day for everyone but the Ontario three. Grab the 4x4 and get to the coast before dark — sunset and cold Imperials on the beach, feet in the Pacific.",
+    days:[
+      {t:"Surf + beach",p:"Morning surf lesson at Tamarindo or Playa Grande — warm water, forgiving waves, everyone stands up eventually. Afternoon beach and recovery, maybe a sunset catamaran with snorkelling. The easy, warm, salt-water day.",e:"Fresh fish and margaritas beachside."},
+      {t:"Volcano + springs",p:"Up to Rincón de la Vieja — ziplines and a waterfall hike through the national park, then soak in the natural hot springs under the volcano. ~1.5h each way, so an early start; it's the adventure day and worth the drive.",e:"Last night, guaro cocktails, pura vida wind-down."}],
+    depart:"Fly out. The good stuff being spread out means a real transfer back to Liberia — leave margin."}
+};
 const WEEKENDS = [
   {id:"w1",label:"Apr 22–25",note:"Cheapest airfare of the year"},
   {id:"w2",label:"May 20–24",note:"Victoria Day — 4 nights, one less vacation day"},
@@ -269,6 +334,38 @@ function mutate(fn){
 
 /* ---------- render ---------- */
 const all = () => [...SEED,...custom];
+let openItin = null; // destination id whose itinerary is showing
+
+function itinHTML(d){
+  const it = ITIN[d.id]; if(!it) return "";
+  const legLine = PEOPLE.map(p=>{
+    const h=d.legs[p.port][0]; return `${p.name} ${h<1?"~0":h}h`;
+  }).join(" · ");
+  return `<div class="detail" id="detail"><div class="inner">
+    <button class="backbtn" data-back="1">← Back to voting</button>
+    <div class="dhero">
+      <div class="eye" style="color:var(--magenta)">The 3-day plan</div>
+      <h2>${esc(d.city)}</h2>
+      <div class="sub">${esc(d.country)} · ${esc(d.port)} · two solid days between the flights</div>
+      <div class="leg">One-way flight: ${esc(legLine)}</div>
+    </div>
+    <div class="dblock">
+      <div class="day">Day 1 · Arrive</div>
+      <div class="dnote travel">${esc(it.arrive)}</div>
+    </div>
+    ${it.days.map((day,i)=>`<div class="dblock">
+      <div class="day">Day ${i+2} · Solid day ${i+1}</div>
+      <h3>${esc(day.t)}</h3>
+      <p>${esc(day.p)}</p>
+      <div class="eve"><b>Evening — </b>${esc(day.e)}</div>
+    </div>`).join("")}
+    <div class="dblock">
+      <div class="day">Day 4 · Home</div>
+      <div class="dnote travel">${esc(it.depart)}</div>
+    </div>
+    <button class="backbtn" data-back="1" style="position:static;margin-top:24px;border:1px solid var(--line);padding:12px;border-radius:2px;width:100%">← Back to voting</button>
+  </div></div>`;
+}
 
 function airBar(p,d){
   const rt = d.legs[p.port][0]*2, pct = Math.min(100, rt/(rt+GROUND)*100);
@@ -304,6 +401,7 @@ function cardHTML(d){
         <div><div class="eye">Go when</div><div class="num">${esc(d.when)}</div></div>
       </div>
       <div class="catch"><b>The catch — </b>${esc(d.catch)}</div>
+      ${ITIN[d.id]?`<button class="itinbtn" data-itin="${d.id}">See the 3-day plan →</button>`:""}
     </div>
     <div class="cfoot">
       ${me?`<div class="row">
@@ -320,6 +418,12 @@ function cardHTML(d){
 }
 
 function render(){
+  // itinerary overlay lives above everything; render/remove based on openItin
+  let host = document.getElementById("detailhost");
+  if(!host){ host=document.createElement("div"); host.id="detailhost"; document.body.appendChild(host); }
+  const dObj = openItin ? all().find(x=>x.id===openItin) : null;
+  host.innerHTML = dObj ? itinHTML(dObj) : "";
+
   document.getElementById("who").innerHTML =
     `<span class="eye" style="letter-spacing:.14em">YOU ARE</span>` +
     PEOPLE.map(p=>`<button class="chip ${me===p.id?"on":""}" data-me="${p.id}">${p.name}<span class="p"> · ${p.port}</span></button>`).join("");
@@ -411,7 +515,10 @@ create policy "update" on forty_state for update using (true);</pre></li>
 /* ---------- events ---------- */
 document.addEventListener("click", async e => {
   const t = e.target.closest("button"); if(!t) return;
-  if(t.dataset.me){ me=t.dataset.me; localStorage.setItem("forty:me",me); render(); }
+  if(t.dataset.itin){ openItin=t.dataset.itin; render(); window.scrollTo(0,0);
+    document.getElementById("detailhost").scrollTop=0; }
+  else if(t.dataset.back){ openItin=null; render(); }
+  else if(t.dataset.me){ me=t.dataset.me; localStorage.setItem("forty:me",me); render(); }
   else if(t.dataset.tab){ tab=t.dataset.tab; render(); }
   else if(t.dataset.sc){ const id=t.dataset.sc,n=+t.dataset.n;
     mutate(b=>{ if(b.scores[id]===n) delete b.scores[id]; else b.scores[id]=n;
